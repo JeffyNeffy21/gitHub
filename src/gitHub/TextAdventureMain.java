@@ -5,7 +5,6 @@ import java.util.*;
 /* some other parts, like rooms, will be explained in class */
 
 public class TextAdventureMain {
-
 //	static int INVSIZE = 10; //size of inventory	
 
 	//instance variables
