@@ -14,7 +14,7 @@ public class TextAdventureMain {
 
 	//the inventory could be an array
 	HashMap<String,Integer> inventory = new HashMap<>();
-	String currentRoom;
+	public String currentRoom;
 	Player player;
 	static boolean alive=true;
 	static boolean won=false;
@@ -63,9 +63,28 @@ public class TextAdventureMain {
 	void lookAtRoom() {
 		Room r=new Room(currentRoom);
 		if (r.isVisited) {
-			
+			System.out.println(currentRoom);
+		} else {
+			r.isVisited=true;
+			System.out.println(currentRoom); 
+			System.out.println(r.description);
 		}
 	}
+	
+	void moveToRoom(char c) {
+		Room r=new Room(currentRoom);
+		String room=r.getExits(c);
+		if (room.equals("")) {
+			System.out.println("You cant go there.");
+		} else {
+			currentRoom = r.getExits(c);
+		}
+	}
+	
+	void showInventory() {
+		
+	}
+	
 	void setup() {
 		System.out.println("Welcome to the game! You are not gonna have a good time! Good luck on your adventure!");
 		Room.setupRooms(roomList);
@@ -253,6 +272,7 @@ public class TextAdventureMain {
     	}
     	
     }
+    
     public boolean attackFirst(double yourDex,double enemyDex) {
 		double rand=Math.random()*(yourDex+enemyDex);
 		if (rand<yourDex) {
@@ -260,6 +280,7 @@ public class TextAdventureMain {
 		}
 		return false;
 	}
+    
     void attack(String enemy) {
     	Player p=new Player();
     	Enemy e=new Enemy(enemy);
@@ -287,6 +308,7 @@ public class TextAdventureMain {
     		}
     }
 }
+
 class Player {
 	int health=100;
 	int maxHp=100;
@@ -294,12 +316,9 @@ class Player {
 	double dex=1.0f;
 	int atk=15;
 	int money=0;
-	
-	
 }
 
 class Room {
-	String name; //caveentrance - cave -cave2 -cave 3
 	String displayName;
 	String description;
 	String N="";
@@ -316,7 +335,7 @@ class Room {
 	}
 	
 	void setExits(String N,String S,String E,String W) {
-		this.N=N;
+		this.N=N; //Cave
 		this.S=S;
 		this.E=E;
 		this.W=W;
@@ -339,23 +358,35 @@ class Room {
 		//
 		//  mineshaft       cave 3
 		// 					cave 2
-		//            		cave             loot 1
+		//            		cave             loot room
 		//              cave entrance
 		//
-		Room r=new Room("Cave entrance", "You are at the cave entrance. Go on, fulfill your destiny and slay Hades \n"
-				+ " Move north to entire the cave");
-		r.setExits("cave", "", "", "");
-		roomList.put("caveentrance", r);
 		
-		r=new Room("Cave", "You have entered the cave");
-		r.setExits("cave2", "caveentrance", "loot1", "");
-		roomList.put("cave", r);
-	}
-	public boolean getRoomStatus() {
-		return isVisited;
-	}
-	public String getDesc() {
-		return description;
+		//cave entrance
+		Room r=new Room("Cave entrance");
+		r.description=("You are at the cave entrance. Go on, fulfill your destiny and slay things.\n" + "Move north to entire the cave");
+		r.setExits("Cave", "", "", "");
+		roomList.put("Cave entrance", r);
+		
+		//cave
+		r=new Room("Cave");
+		r.description=("You have entered the cave you get this tingly feeling in your spine.\n"+"There seems to be a loot room to the East\n"
+				+ "You could advance further into the cave North");
+		r.setExits("Cave 2", "Cave entrance", "Loot room", "");
+		roomList.put("Cave", r);
+		
+		//loot room
+		r=new Room("Loot room");
+		r.description=("Cool room with a nice golden chest inside. Whats in the chest?\n"
+				+ "Go West to return into the cave.");
+		r.setExits("", "", "", "Cave");
+		roomList.put("Loot room", r);
+		
+		//cave 2
+		r=new Room("Cave 2");
+		r.description=("Further down the cave, you see a bright light further down North.");
+		r.setExits("Cave 3", "Cave", "", "");
+		roomList.put("Cave 2", r);
 	}
 	
 }
@@ -371,8 +402,10 @@ class Item {
 		Item z=new Item("Holy Sword", "A long sword, seems like there is some writing on it.");
 		z.writing="An ancient sword used to slay evil. Effective against demons";
 		itemList.put("sword", z);
-		roomList.get("loot1").items.add("sword");
+		roomList.get("Loot room").items.add("sword");
 	}
+	
+	
 }
 
 class Enemy {
