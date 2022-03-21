@@ -5,6 +5,7 @@ import java.util.*;
 /* some other parts, like rooms, will be explained in class */
 
 public class TextAdventureMain {
+
 //	static int INVSIZE = 10; //size of inventory	
 
 	//instance variables
@@ -31,16 +32,18 @@ public class TextAdventureMain {
 
 		setup(); //create all objects needed, including map; print intro. message
 		
-		lookAtRoom(true); //display information about the current room
+		lookAtRoom(); //display information about the current room
 
 		/***** MAIN GAME LOOP *****/
 		while (playing) {
 
 			if (!alive) {
 				System.out.println("You lost, you suck, poor you.");
+				playing=false;
 			}
 			if (won) {
 				System.out.println("Congrats, you actually won!     ... Or did you?");
+				playing=false;
 			}
 
 			
@@ -57,7 +60,12 @@ public class TextAdventureMain {
 		// does anything need to be done after th emain game loop exits?
 
 	}
-
+	void lookAtRoom() {
+		Room r=new Room(currentRoom);
+		if (r.isVisited) {
+			
+		}
+	}
 	void setup() {
 		System.out.println("Welcome to the game! You are not gonna have a good time! Good luck on your adventure!");
 		Room.setupRooms(roomList);
@@ -118,41 +126,45 @@ public class TextAdventureMain {
 		switch(word1) {
 		
 		/**** one word commands ****/
-		case "quit":
-			System.out.print("Do you really want to quit the game? ");
-			String ans = getCommand().toUpperCase();
-			if (ans.equals("YES") || ans.equals("Y")) {
-				System.out.print("Thanks for playing. Bye.");
-				return false;
-			}	
-		case "n": case "s": case "w": case "e": case "u": case "d":
-		case "north": case "south": case "west": case "east": case "up": case "down":
-			moveToRoom(word1.charAt(0));
-			break;
-		case "i": case "inventory":
-			showInventory();
-			break;
-		case "sleep":
-			sleep();			
-			break;	
-		case "help":
-			printHelp();
-			break;
-			
-		if (!word2.equals("")) {
-			case "take": case "grab": case "pickup":
-				takeItem(word2);
-//			case "read":
-//				readObject(word2);
-//				break;
-			case "eat":
-				eatItem(word2);
-				break;		
-			case "drop":
-				dropItem(word2);
-			case "attack": case "fight": case "kill":
-				attack(word2);
+			case "quit":
+				System.out.print("Are you really a loser? You wanna quit now?");
+				String ans = getCommand().toUpperCase();
+				if (ans.equals("YES") || ans.equals("Y")) {
+					System.out.print("Aww you suck!");
+					alive=false;
+				}	
+			case "n": case "s": case "w": case "e": case "u": case "d":
+			case "north": case "south": case "west": case "east": case "up": case "down":
+				moveToRoom(word1.charAt(0));
+				break;
+			case "i": case "inventory":
+				showInventory();
+				break;
+			case "sleep":
+				sleep();			
+				break;	
+			case "help":
+				printHelp();
+				break;
 				
+			if (!word2.equals("")) {
+			
+				switch(word2) {
+				
+				case "take": case "grab": case "pickup":
+					takeItem(word2);
+	//			case "read":
+	//				readObject(word2);
+	//				break;
+				case "eat":
+					eatItem(word2);
+					break;		
+				case "drop":
+					dropItem(word2);
+				case "attack": case "fight": case "kill":
+					attack(word2);
+				
+			}
 		}
 			
 		/**** SPECIAL COMMANDS ****/
@@ -164,15 +176,27 @@ public class TextAdventureMain {
 		return true;
 	}
 	//tons of other methods go here ...
+	void buy() {
+		if (!currentRoom.equals(//"room with merchant")) {
+			System.out.println("You can't buy anything here");
+		} else {
+			
+		}
+	}
 	void sleep() {
-		int rand=(int)(Math.random()*9) {
+		int rand=(int)(Math.random()*9); 
 			if (rand==1) {
 				System.out.println("Unlucky. While you were sleeping, you were brutally murdered by a chicken.");
 				
 			} else {
-				
+				System.out.println("You wake up with some good rest   +15hp");
+				if (player.health<player.maxHp-15) {
+					player.health=player.health+15;
+				} else {
+					player.health=player.maxHp;
+				}
 			}
-		}
+
 	}
 	void printHelp() {
 		System.out.println("Move around with directions: n,w,s,e,up,down");
@@ -260,6 +284,7 @@ public class TextAdventureMain {
     			p.health=(p.health-edmg);
     			System.out.println("You now have "+p.health+" hp.");
     		
+    		}
     }
 }
 class Player {
@@ -268,21 +293,88 @@ class Player {
 	double def=5.0f;
 	double dex=1.0f;
 	int atk=15;
+	int money=0;
 	
-	
-}
-class AdventureMain {
 	
 }
 
 class Room {
-	int et1=
+	String name; //caveentrance - cave -cave2 -cave 3
+	String displayName;
+	String description;
+	String N="";
+	String W="";
+	String S="";
+	String E="";
+	boolean isVisited=false;
+//	boolean isDark;
+	
+	ArrayList<String> items=new ArrayList<String>();
+	
+	Room(String displayName) {
+		this.displayName=displayName;
+	}
+	
+	void setExits(String N,String S,String E,String W) {
+		this.N=N;
+		this.S=S;
+		this.E=E;
+		this.W=W;
+	}
+	
+	String getExits(char dir) {
+		switch (dir) {
+		case 'N': case 'n': return this.N;
+		case 'S': case 's': return this.S;
+		case 'W': case 'w': return this.W;
+		case 'E': case 'e': return this.E;
+		default: return "";
+		}
+	}
+	
+	static void setupRooms(HashMap<String,Room> roomList) {
+		//
+		//
+		//
+		//
+		//  mineshaft       cave 3
+		// 					cave 2
+		//            		cave             loot 1
+		//              cave entrance
+		//
+		Room r=new Room("Cave entrance", "You are at the cave entrance. Go on, fulfill your destiny and slay Hades \n"
+				+ " Move north to entire the cave");
+		r.setExits("cave", "", "", "");
+		roomList.put("caveentrance", r);
+		
+		r=new Room("Cave", "You have entered the cave");
+		r.setExits("cave2", "caveentrance", "loot1", "");
+		roomList.put("cave", r);
+	}
+	public boolean getRoomStatus() {
+		return isVisited;
+	}
+	public String getDesc() {
+		return description;
+	}
 	
 }
 
 class Item {
-	
+	String name;
+	String description;
+	String writing="";
+	Item(String name,String description) {
+		
+	}
+	static void setupItems(HashMap<String,Item> itemList, HashMap<String, Room> roomList) {
+		Item z=new Item("Holy Sword", "A long sword, seems like there is some writing on it.");
+		z.writing="An ancient sword used to slay evil. Effective against demons";
+		itemList.put("sword", z);
+		roomList.get("loot1").items.add("sword");
+	}
 }
+
 class Enemy {
 	
 	int atk=0;
@@ -291,17 +383,17 @@ class Enemy {
 	
 	Enemy(String name) {
 		
-		if (name.equals("Demon")) {
+		if (name.equals("Goblin")) {
 			atk=15;
 			dex=0.9;
 			health=50;
 		}
-		if (name.equals("Cerebus")) {
+		if (name.equals("Demon")) {
 			atk=20;
 			dex=1.8;
 			health=150;
 		}
-		if (name.equals("Hades")) {
+		if (name.equals("Flying turtle")) {
 			atk=50;
 			dex=0.7;
 			health=250;
@@ -309,39 +401,4 @@ class Enemy {
 	}
 	
 }
-class Attack {
-	Player p=new Player();
-	Enemy e=new Enemy(); //need room to specify enemy
-	public boolean attackFirst(double yourDex,double enemyDex) {
-		double rand=Math.random()*(yourDex+enemyDex);
-		if (rand<yourDex) {
-			return true;
-		}
-		return false;
-	}
-	public void damage(Player p, Enemy e) {
-		this.p=p;
-		this.e=e;
-		if (attackFirst(p.dex,e.dex)) {
-			int crit=(int)(Math.random()*9);
-			if (crit==1) {
-				System.out.println("You crit him for "+p.atk*2+" damage.");
-				e.health=e.health-p.atk*2;
-				System.out.println("It now has "+e.health+" hp.");
-			} else {
-				e.health=e.health-p.atk;
-				System.out.println("It now has "+e.health+" hp.");
-			}
-		} else {
-			int edmg=(int)(e.atk*(1-(p.def/100.0)));
-			int crit=(int)(Math.random()*11);
-			if (crit==1) {
-				System.out.println("It crit you for "+edmg*2+" damage.");
-				p.health=p.health-edmg*2;
-				System.out.println("You now have "+p.health+" hp.");
-			} 
-			p.health=(p.health-edmg);
-			System.out.println("You now have "+p.health+" hp.");
-		}
-	}
-}
+
