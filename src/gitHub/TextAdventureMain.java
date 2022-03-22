@@ -3,9 +3,8 @@ import java.util.*;
 
 /* A skeleton program for a text adventure game */
 /* some other parts, like rooms, will be explained in class */
-
 public class TextAdventureMain {
-
+	static Scanner sc=new Scanner(System.in);
 //	static int INVSIZE = 10; //size of inventory	
 
 	//instance variables
@@ -26,10 +25,11 @@ public class TextAdventureMain {
 	}
 
 	AdventureMain() {
-
+		if (currentRoom.equals("lava")) {
+			System.out.println("You took a bath in lava and died after burning in lava and dying.");
+		}
 		boolean playing = true;
 		String command = "";
-
 		setup(); //create all objects needed, including map; print intro. message
 		
 		lookAtRoom(); //display information about the current room
@@ -39,11 +39,11 @@ public class TextAdventureMain {
 
 			if (!alive) {
 				System.out.println("You lost, you suck, poor you.");
-				playing=false;
+				break;
 			}
 			if (won) {
 				System.out.println("Congrats, you actually won!     ... Or did you?");
-				playing=false;
+				break;
 			}
 
 			
@@ -82,18 +82,21 @@ public class TextAdventureMain {
 	}
 	
 	void showInventory() {
-		
+		System.out.println(" INVENTORY: ");
+		for (Map.Entry item:inventory.entrySet()) {
+			System.out.println(item.getKey()+" : "+item.getValue());
+		}
 	}
 	
 	void setup() {
 		System.out.println("Welcome to the game! You are not gonna have a good time! Good luck on your adventure!");
 		Room.setupRooms(roomList);
+		Item.setupItems(itemList, roomList);
 		// ... more stuff ...
 		currentRoom = "clearing";
 	}
 
 	String getCommand() {
-		Scanner sc = new Scanner(System.in);		
 		String text = sc.nextLine();
 		if (text.length() == 0) text = "qwerty"; //default command
 		//sc.close();
@@ -144,7 +147,6 @@ public class TextAdventureMain {
 		/***** MAIN PROCESSING *****/
 		switch(word1) {
 		
-		/**** one word commands ****/
 			case "quit":
 				System.out.print("Are you really a loser? You wanna quit now?");
 				String ans = getCommand().toUpperCase();
@@ -152,54 +154,162 @@ public class TextAdventureMain {
 					System.out.print("Aww you suck!");
 					alive=false;
 				}	
-			case "n": case "s": case "w": case "e": case "u": case "d":
-			case "north": case "south": case "west": case "east": case "up": case "down":
+				break;
+				
+			case "n": case "s": case "w": case "e":
+			case "north": case "south": case "west": case "east": 
 				moveToRoom(word1.charAt(0));
 				break;
+				
 			case "i": case "inventory":
 				showInventory();
 				break;
+				
 			case "sleep":
 				sleep();			
 				break;	
+				
 			case "help":
 				printHelp();
 				break;
-				
-			if (!word2.equals("")) {
-			
-				switch(word2) {
-				
-				case "take": case "grab": case "pickup":
-					takeItem(word2);
-	//			case "read":
-	//				readObject(word2);
-	//				break;
-				case "eat":
-					eatItem(word2);
-					break;		
-				case "drop":
-					dropItem(word2);
-				case "attack": case "fight": case "kill":
-					attack(word2);
-				
-			}
+			default: 
+				System.out.println("Sorry, I don't understand that command");
 		}
+		if (!word2.equals("")) {
+		
 			
-		/**** SPECIAL COMMANDS ****/
-		// ...		
-
-		default: 
-			System.out.println("Sorry, I don't understand that command");
+			switch(word2) {
+				
+					case "take": case "grab": case "pickup":
+						takeItem(word2);
+						break;
+						
+					case "eat":
+						eatItem(word2);
+						break;	
+						
+					case "drop":
+						dropItem(word2);
+						break;
+						
+					case "attack": case "fight": case "kill":
+						attack(word2);
+						break;
+				
+					default: 
+						System.out.println("Sorry, I don't understand that command");
+			}
 		}
 		return true;
 	}
 	//tons of other methods go here ...
+	
 	void buy() {
-		if (!currentRoom.equals(//"room with merchant")) {
+		boolean sword=false;
+		if (!currentRoom.equals("Merchant")) {
 			System.out.println("You can't buy anything here");
 		} else {
-			
+			String r;
+			do {
+				System.out.println("\t\tSHOP\t\t");
+				System.out.println("\t Current Balance: $"+player.money);
+				System.out.println("1)\tHealing potion    $10\t");
+				System.out.println("2)\tAttack potion     $15\t");
+				System.out.println("3)\tDefense potion    $15\t");
+				System.out.println("4)\tUpgrade Sword     $40\t");
+				System.out.print("type 'Q' to leave shop or type a # to buy item: ");
+				String a=sc.nextLine();
+				r=a;
+				System.out.println();
+				
+				if (a.equals("Q") || a.equals("q")) {
+					return;
+				}
+				if (a.equals("1")) {
+					if (player.money<10) {
+						System.out.println("Not enough balance.");
+					} else {
+						System.out.print("How many you want to buy? ");
+						int amount=sc.nextInt();
+						System.out.println();
+						
+						if (player.money<(10*amount)) {
+							System.out.println("Not enought balance.");
+						} else {
+							player.money-=(10*amount);
+								if (inventory.containsKey("healing pot")) { // check for existing items
+						    		inventory.put("healing pot", inventory.get("healing pot")+amount);
+						    		System.out.println("You bought the potions. Now you have "+inventory.get("healing pot")+" healing pots.");
+						    	} else {
+						    		inventory.put("healing pot", 1); // add first item
+						    		System.out.println("You bought the healing potion.");
+						    	}
+						}
+					}
+				}
+				if (a.equals("2")) {
+					if (player.money<15) {
+						System.out.println("Not enough balance.");
+					} else {
+						System.out.print("How many you want to buy? ");
+						int amount=sc.nextInt();
+						System.out.println();
+						
+						if (player.money<(15*amount)) {
+							System.out.println("Not enought balance.");
+						} else {
+							player.money-=(15*amount);
+								if (inventory.containsKey("atk pot")) { // check for existing items
+						    		inventory.put("atk pot", inventory.get("atk pot")+amount);
+						    		System.out.println("You bought the potions. Now you have "+inventory.get("atk pot")+" attack pots.");
+						    	} else {
+						    		inventory.put("atk pot", 1); // add first item
+						    		System.out.println("You bought the attack potion.");
+						    	}
+						}
+					}
+				}
+				if (a.equals("3")) {
+					if (player.money<15) {
+						System.out.println("Not enough balance.");
+					} else {
+						System.out.print("How many you want to buy? ");
+						int amount=sc.nextInt();
+						System.out.println();
+						
+						if (player.money<(15*amount)) {
+							System.out.println("Not enought balance.");
+						} else {
+							player.money-=(15*amount);
+								if (inventory.containsKey("def pot")) { // check for existing items
+						    		inventory.put("def pot", inventory.get("def pot")+amount);
+						    		System.out.println("You bought the potions. Now you have "+inventory.get("def pot")+" defense pots.");
+						    	} else {
+						    		inventory.put("def pot", 1); // add first item
+						    		System.out.println("You bought the defense potion.");
+						    	}
+						}
+					}
+				}
+				if (a.equals("4")) {
+					if (sword) {
+						System.out.println("You cant upgrade it again");
+					}
+					System.out.print("You can only upgrade once, upgrade? (Y/N): ");
+					String s= sc.nextLine();
+					if (s.equals("Y") || s.equals("y")) {
+						if (player.money<40) {
+							System.out.println("Not enough balance.");
+						} else {
+							sword=true;
+							player.money-=40;
+							player.atk+=10;
+							System.out.println("You have successfully upgrade your sword.");
+						}
+					}
+						
+				}
+			} while (true);
 		}
 	}
 	void sleep() {
@@ -219,14 +329,14 @@ public class TextAdventureMain {
 	}
 	void printHelp() {
 		System.out.println("Move around with directions: n,w,s,e,up,down");
-		System.out.println("Common commands include : kill (enemy), eat (item), drop (item), take (item), i (inventory), sleep (small heal with risk)");
+		System.out.println("Common commands include : kill (enemy), eat (item), drop (item), take (item), i (inventory), sleep, observe (item)");
 	}
 	void dropItem(String item) {
 		if (!inventory.containsKey(item)) {
 			System.out.println("Cant drop what you dont have bozo.");
 		}
 	}
-    void takeItem(String item) {
+    public void takeItem(String item) {
     	if (inventory.containsKey(item)) { // check for existing items
     		inventory.put(item, inventory.get(item)+1);
     		System.out.println("You took the "+item+". Now you have "+inventory.get(item)+" "+item+"s.");
@@ -315,7 +425,7 @@ class Player {
 	double def=5.0f;
 	double dex=1.0f;
 	int atk=15;
-	int money=0;
+	int money=10;
 }
 
 class Room {
@@ -352,15 +462,11 @@ class Room {
 	}
 	
 	static void setupRooms(HashMap<String,Room> roomList) {
-		//
-		//
-		//
-		//
-		//  mineshaft       cave 3
-		// 					cave 2
-		//            		cave             loot room
-		//              cave entrance
-		//
+		//					Boss Room
+		// Lava  Mineshaft  Cave 3           Merchant
+		// 					Cave 2
+		//            		Cave             Loot room
+		//              Cave entrance
 		
 		//cave entrance
 		Room r=new Room("Cave entrance");
@@ -387,6 +493,34 @@ class Room {
 		r.description=("Further down the cave, you see a bright light further down North.");
 		r.setExits("Cave 3", "Cave", "", "");
 		roomList.put("Cave 2", r);
+		
+		//cave 3
+		r=new Room("Cave 3");
+		r.description=("To the North you see a formidable enemy, to the East there seems to be a merchant.\n"
+				+ "To the West, there is a mineshaft. You can always turn back now.");
+		r.setExits("Boss Room", "Cave 2", "Merchant", "Mineshaft");
+		roomList.put("Cave 3", r);
+		
+		//merchant
+		r=new Room("Merchant");
+		r.description=("A cozy room with a kind merchant running a shop.");
+		r.setExits("", "", "", "Cave 3");
+		roomList.put("Merchant", r);
+		
+		//mineshaft
+		r=new Room("Mineshaft");
+		r.description=("A small mineshaft with a small railroad transport system. "
+				+ "Riding the system to the West seems dangerous...");
+		r.setExits("", "", "Cave 3", "Lava");
+		
+		// lava
+		r=new Room("Lava");
+		r.description=("A pool of lava, lava is very hot. Lava is bad.");
+		
+		//Boss room
+		r=new Room("Boss Room");
+		r.description=("A huge chamber with a monstrous flying turtle.");
+		
 	}
 	
 }
@@ -399,10 +533,23 @@ class Item {
 		
 	}
 	static void setupItems(HashMap<String,Item> itemList, HashMap<String, Room> roomList) {
-		Item z=new Item("Holy Sword", "A long sword, seems like there is some writing on it.");
-		z.writing="An ancient sword used to slay evil. Effective against demons";
+		Item z=new Item("sword", "A long sword, seems like there is some writing on it.");
+		z.writing="An ancient sword used to slay evil. Effective against monsters.";
 		itemList.put("sword", z);
 		roomList.get("Loot room").items.add("sword");
+		
+		z=new Item("healing pot", "This potion heals your wounds, and makes you feel better.");
+		itemList.put("healing pot", z);
+		roomList.get("Loot room").items.add("healing pot");
+		
+		z=new Item("dex pot", "This potion makes you feel energized, and lightweight.");
+		itemList.put("dex pot", z);
+		roomList.get("Loot room").items.add("dex pot");
+		
+		z=new Item("life pot", "This potion increases your max health, and makes you feel healthier than ever.");
+		itemList.put("life pot", z);
+		roomList.get("Loot room").items.add("life pot");
+		
 	}
 	
 	
@@ -415,7 +562,6 @@ class Enemy {
 	int health=0;
 	
 	Enemy(String name) {
-		
 		if (name.equals("Goblin")) {
 			atk=15;
 			dex=0.9;
