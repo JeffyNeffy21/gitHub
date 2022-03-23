@@ -1,38 +1,31 @@
 package gitHub;
 import java.util.*;
 
-/* A skeleton program for a text adventure game */
-/* some other parts, like rooms, will be explained in class */
 public class TextAdventureMain {
 	static Scanner sc=new Scanner(System.in);
-//	static int INVSIZE = 10; //size of inventory	
 
-	//instance variables
 	HashMap<String,Room> roomList = new HashMap<String,Room>();
 	HashMap<String, Item> itemList = new HashMap<String,Item>(); //list of all item objects
-
-	//the inventory could be an array
 	HashMap<String,Integer> inventory = new HashMap<>();
-	public String currentRoom;
+	public String currentRoom="";
 	Player player;
 	static boolean alive=true;
 	static boolean won=false;
 	
-	int turns = 0;
-
 	public static void main(String[]args){
-		new AdventureMain();
+
+		TextAdventureMain t=new TextAdventureMain();
+		t.AdventureMain();
 	}
 
-	AdventureMain() {
+	void AdventureMain() {
 		if (currentRoom.equals("lava")) {
 			System.out.println("You took a bath in lava and died after burning in lava and dying.");
 		}
 		boolean playing = true;
 		String command = "";
 		setup(); //create all objects needed, including map; print intro. message
-		
-		lookAtRoom(); //display information about the current room
+		lookAtRoom();
 
 		/***** MAIN GAME LOOP *****/
 		while (playing) {
@@ -48,8 +41,8 @@ public class TextAdventureMain {
 
 			
 			command = getCommand();
-
 			playing = parseCommand(command);
+			System.out.println(playing);
 
 			//check to see if player has died (in whichever various ways the player can die)
 
@@ -61,12 +54,12 @@ public class TextAdventureMain {
 
 	}
 	void lookAtRoom() {
-		Room r=new Room(currentRoom);
+		Room r=roomList.get(currentRoom);
 		if (r.isVisited) {
-			System.out.println(currentRoom);
+			System.out.println(r.displayName);
 		} else {
 			r.isVisited=true;
-			System.out.println(currentRoom); 
+			System.out.println(r.displayName); 
 			System.out.println(r.description);
 		}
 	}
@@ -93,7 +86,7 @@ public class TextAdventureMain {
 		Room.setupRooms(roomList);
 		Item.setupItems(itemList, roomList);
 		// ... more stuff ...
-		currentRoom = "clearing";
+		currentRoom = "Cave entrance";
 	}
 
 	String getCommand() {
@@ -106,44 +99,29 @@ public class TextAdventureMain {
 	
 	boolean parseCommand(String text) {
 
-		/***** PREPROCESSING *****/
-		//P1. 
 		text = text.toLowerCase().trim();	//the complete string BEFORE parsing
-		
-
-		//handle situation where no words entered ...
-
-		
-		//P2. word replacement
 		text = text.replaceAll(" into ", " in ");
 		text = text.replaceAll(" rocks", " rock");
 		text = text.replaceAll("pick up", "pickup");
 		text = text.replaceAll("look at", "lookat");
 		text = text.replaceAll("climb up", "climbup");
 		
-		
 		String words[] = text.split(" ");
 		
-		//P3. remove all instances of "THE"
 		ArrayList<String> wordlist = new ArrayList<String>(Arrays.asList(words));		//array list of words
 		for(int i=0; i< wordlist.size(); i++) {
 			if (wordlist.get(i).equals("the")) wordlist.remove(i--);			
 		}
 
-		//separate out into word1, word2, etc.
-		// ...
 		String word1=words[0];
 		String word2="";
 		String word3="";
 		if (words.length>1) {
 			word2=words[1];
 		}
-		if (words.length>2) {
-			word3=words[2];
-		}
-		
-		
-
+//		if (words.length>2) {
+//			word3=words[2];
+//		}
 		/***** MAIN PROCESSING *****/
 		switch(word1) {
 		
@@ -370,8 +348,6 @@ public class TextAdventureMain {
     			player.atk+=3;
     		}
     		
-    		
-    		
     		int itemLeft=inventory.get(item)-1;
     		inventory.put(item,itemLeft);
     		if (itemLeft==1) {
@@ -436,7 +412,6 @@ class Room {
 	String S="";
 	String E="";
 	boolean isVisited=false;
-//	boolean isDark;
 	
 	ArrayList<String> items=new ArrayList<String>();
 	
@@ -512,14 +487,17 @@ class Room {
 		r.description=("A small mineshaft with a small railroad transport system. "
 				+ "Riding the system to the West seems dangerous...");
 		r.setExits("", "", "Cave 3", "Lava");
+		roomList.put("Mineshaft", r);
 		
 		// lava
 		r=new Room("Lava");
 		r.description=("A pool of lava, lava is very hot. Lava is bad.");
+		roomList.put("Lava", r);
 		
 		//Boss room
 		r=new Room("Boss Room");
 		r.description=("A huge chamber with a monstrous flying turtle.");
+		roomList.put("Boss Room", r);
 		
 	}
 	
@@ -580,4 +558,3 @@ class Enemy {
 	}
 	
 }
-
