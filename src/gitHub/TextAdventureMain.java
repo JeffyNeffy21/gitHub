@@ -19,9 +19,7 @@ public class TextAdventureMain {
 	}
 
 	void AdventureMain() {
-		if (currentRoom.equals("lava")) {
-			System.out.println("You took a bath in lava and died after burning in lava and dying.");
-		}
+		
 		boolean playing = true;
 		String command = "";
 		setup(); //create all objects needed, including map; print intro. message
@@ -31,18 +29,28 @@ public class TextAdventureMain {
 		/***** MAIN GAME LOOP *****/
 		while (playing) {
 
+			if (currentRoom.equals("Lava")) {
+				System.out.println("You took a bath in lava and died after burning in lava and dying.");
+				break;
+			}
+			
 			if (!alive) {
 				System.out.println("You lost, you suck, poor you.");
 				break;
 			}
 			if (won) {
-				System.out.println("Congrats, you actually won!     ... Or did you?");
 				break;
 			}
 			System.out.println();
 			command = getCommand();
 			playing = parseCommand(command);
 
+		}
+		System.out.println();
+		if (won) {
+			System.out.println("Congrats! You Beat the legendary flying turtle and beat the game!");
+		} else {
+			System.out.println(" YOU LOSE ");
 		}
 
 
@@ -392,7 +400,9 @@ public class TextAdventureMain {
     	}
     	
     }
-    
+    void fight() {
+    	
+    }
     public boolean attackFirst(double yourDex,double enemyDex) {
 		double rand=Math.random()*(yourDex+enemyDex);
 		if (rand<yourDex) {
@@ -481,34 +491,34 @@ class Room {
 		
 		//cave entrance
 		Room r=new Room("Cave entrance");
-		r.description=("You are at the cave entrance. Go on, fulfill your destiny and slay things.\n" + "Move north to enter the cave");
+		r.description=("You are at the cave entrance. This cave is said to be full of legendary treasures, but also monsters!\n" + "Move north to enter the cave...");
 		r.setExits("Cave", "", "", "");
 		roomList.put("Cave entrance", r);
 		
 		//cave
 		r=new Room("Cave");
-		r.description=("You have entered the cold chilling cave and you get this tingly feeling down your spine.\n"+"There seems to be a loot room to the East\n"
-				+ "You could advance further into the cave North");
+		r.description=("You have entered the strange cave and a cold tingly feeling rides down your spine.\n"+"There seems to be a loot room to the East with weapons and potions...\n"
+				+ "You could advance further into the cave North...");
 		r.setExits("Cave 2", "Cave entrance", "Loot room", "");
 		roomList.put("Cave", r);
 		
 		//loot room
 		r=new Room("Loot room");
-		r.description=("Cool room with a nice golden chest inside. Whats in the chest?\n"
-				+ "There is a 'sword', 'healing pot', 'dex pot' and 'life pot'.");
+		r.description=("You have entered a cool room with a nice golden chest inside. Whats in the chest?\n"
+				+ "Looks like there is a 'sword', 'healing pot', 'dex pot' and 'life pot'.");
 		r.setExits("", "", "", "Cave");
 		roomList.put("Loot room", r);
 		
 		//cave 2
 		r=new Room("Cave 2");
-		r.description=("Further down the cave, you see a bright light further down North.");
+		r.description=("Further down the cave, the only thing you can see is a bright light further down the cave.");
 		r.setExits("Cave 3", "Cave", "", "");
 		roomList.put("Cave 2", r);
 		
 		//cave 3
 		r=new Room("Cave 3");
-		r.description=("To the North you see a formidable enemy, to the East there seems to be a merchant.\n"
-				+ "To the West, there is a mineshaft. You can always turn back now.");
+		r.description=("To the North there is a spooky chamber, to the East there seems to be a merchant.\n"
+				+ "To the West, there is a mineshaft. You can always turn back!");
 		r.setExits("Boss Room", "Cave 2", "Merchant", "Mineshaft");
 		roomList.put("Cave 3", r);
 		
@@ -520,14 +530,15 @@ class Room {
 		
 		//mineshaft
 		r=new Room("Mineshaft");
-		r.description=("A small mineshaft with a small railroad transport system. "
-				+ "Riding the system to the West seems dangerous...");
+		r.description=("You enter a small mineshaft and you see a golden glowing further in. I could be gold!\n"
+				+ "... but it seems quite unsafe. Travel west to venture deeper.");
 		r.setExits("", "", "Cave 3", "Lava");
 		roomList.put("Mineshaft", r);
 		
 		// lava
 		r=new Room("Lava");
-		r.description=("A pool of lava, lava is very hot. Lava is bad.");
+		r.description=("You finally find out what it is... It is a pool of lava.\n"
+				+ "Unfortunately, you are clumsy and fell into the lava.");
 		roomList.put("Lava", r);
 		
 		//Boss room
