@@ -192,7 +192,7 @@ public class TextAdventureMain {
 						takeItem(word2);
 						break;
 						
-					case "eat":
+					case "eat": case "drink":
 						eatItem(word2);
 						break;	
 						
@@ -201,6 +201,7 @@ public class TextAdventureMain {
 						break;
 						
 					case "attack": case "fight": case "kill":
+						//fight();
 						attack(word2);
 						break;
 				
@@ -373,27 +374,36 @@ public class TextAdventureMain {
     		if (item.equals("healingpot")) {
     			if (p.health==p.maxHp) {
     				System.out.println("You are at full hp");
+    				return;
     			} else if (p.health<p.maxHp-50) {
     				p.health+=50;
+    				System.out.println("You are now at "+p.health+" hp.");
     			} else {
     				p.health=p.maxHp;
+    				System.out.println("You are now at full hp");
     			}
     		}
     		
     		else if (item.equals("lifepot")) {
     			p.maxHp+=15;
+    			System.out.println("Your max health is now "+p.maxHp);
     		} else if (item.equals("defpot")) {
     			p.def+=5;
+    			System.out.println("Your defense is now "+p.def);
     		} else if (item.equals("dexpot")) {
     			p.dex+=0.2;
+    			System.out.println("Your dexterity is now "+p.dex);
     		} else if (item.equals("atkpot")) {
     			p.atk+=3;
+    			System.out.println("Your attack is now "+p.atk);
     		}
     		
     		int itemLeft=inventory.get(item)-1;
     		inventory.put(item,itemLeft);
     		if (itemLeft==1) {
     			System.out.println("You only have one "+item+" left.");
+    		} else if (itemLeft==0) {
+    			inventory.remove(item);
     		} else {
     			System.out.println("You now have "+inventory.get(item)+" "+item+"s left.");
     		}
@@ -401,9 +411,13 @@ public class TextAdventureMain {
     	
     }
     void fight() {
-    	
+    	if (!inventory.containsKey("sword")) {
+    		System.out.println("You have nothing to fight with.");
+    	} else {
+    		
+    	}
     }
-    public boolean attackFirst(double yourDex,double enemyDex) {
+    boolean attackFirst(double yourDex,double enemyDex) {
 		double rand=Math.random()*(yourDex+enemyDex);
 		if (rand<yourDex) {
 			return true;
@@ -565,15 +579,15 @@ class Item {
 		
 		z=new Item("healing pot", "This potion heals your wounds, and makes you feel better.");
 		itemList.put("healing pot", z);
-		roomList.get("Loot room").items.add("healing pot");
+		roomList.get("Loot room").items.add("healingpot");
 		
-		z=new Item("dex pot", "This potion makes you feel energized, and lightweight.");
+		z=new Item("dexpot", "This potion makes you feel energized, and lightweight.");
 		itemList.put("dex pot", z);
-		roomList.get("Loot room").items.add("dex pot");
+		roomList.get("Loot room").items.add("dexpot");
 		
-		z=new Item("life pot", "This potion increases your max health, and makes you feel healthier than ever.");
+		z=new Item("lifepot", "This potion increases your max health, and makes you feel healthier than ever.");
 		itemList.put("life pot", z);
-		roomList.get("Loot room").items.add("life pot");
+		roomList.get("Loot room").items.add("lifepot");
 		
 	}
 	
