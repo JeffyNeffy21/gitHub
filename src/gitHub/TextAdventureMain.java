@@ -567,6 +567,7 @@ class Room {
 		//Boss room
 		r=new Room("Boss Room");
 		r.description=("A huge chamber with a monstrous flying turtle.");
+		r.enemy = "Goblin";
 		roomList.put("Boss Room", r);
 
 	}
