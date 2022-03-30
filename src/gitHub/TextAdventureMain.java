@@ -462,6 +462,7 @@ class Room {
 	String W="";
 	String S="";
 	String E="";
+	String enemy = "";
 	
 	boolean isVisited=false;
 
