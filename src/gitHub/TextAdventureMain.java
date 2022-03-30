@@ -49,7 +49,7 @@ public class TextAdventureMain {
 		}
 		System.out.println();
 		if (won) {
-			System.out.println("Congrats! You Beat the legendary flying turtle and beat the game!");
+			System.out.println("Congrats! You Beat the legendary flying turtlce and beat the game!");
 		} else {
 			System.out.println(" YOU LOSE ");
 		}
@@ -191,6 +191,14 @@ public class TextAdventureMain {
 			case "look":
 				lookAtRoom(1);
 				break; 
+			case "a":
+				Room r = roomList.get(currentRoom);
+				if (r.enemy != "") {
+					attack(r.enemy);
+				} else {
+					System.out.println("There are no enemies here");
+				}
+				break;
 
 			default: 
 				System.out.println("Sorry, I don't understand that command");
@@ -416,28 +424,42 @@ boolean attackFirst(double yourDex,double enemyDex) {
 }
 
 void attack(String enemy) {
-	Enemy e=new Enemy(enemy);
-	if (attackFirst(p.dex,e.dex)) {
-		int crit=(int)(Math.random()*9);
-		if (crit==1) {
-			System.out.println("You crit him for "+p.atk*2+" damage.");
-			e.health=e.health-p.atk*2;
-			System.out.println("It now has "+e.health+" hp.");
-		} else {
-			e.health=e.health-p.atk;
-			System.out.println("It now has "+e.health+" hp.");
+	Enemy e = new Enemy(enemy);
+	while (e.health > 0 && p.health > 0) {
+		System.out.println("Fight or heal?");
+		String a = sc.nextLine();
+		if (a.equals("f")) {
+			if (attackFirst(p.dex, e.dex)) {
+				int crit = (int) (Math.random() * 9);
+				if (crit == 1) {
+					System.out.println("You crit him for " + p.atk * 2 + " damage.");
+					e.health = e.health - p.atk * 2;
+					System.out.println("It now has " + e.health + " hp.");
+				} else {
+					e.health = (e.health - p.atk);
+					System.out.println("It now has " + e.health + " hp.");
+				}
+			} else {
+				int edmg = (int) (e.atk * (1 - (p.def / 100.0)));
+				int crit = (int) (Math.random() * 11);
+				if (crit == 1) {
+					System.out.println("It crit you for " + edmg * 2 + " damage.");
+					p.health = p.health - edmg * 2;
+					System.out.println("You now have " + p.health + " hp.");
+				}
+				p.health = (p.health - edmg);
+				System.out.println("You now have " + p.health + " hp.");
+			}
 		}
-	} else {
-		int edmg=(int)(e.atk*(1-(p.def/100.0)));
-		int crit=(int)(Math.random()*11);
-		if (crit==1) {
-			System.out.println("It crit you for "+edmg*2+" damage.");
-			p.health=p.health-edmg*2;
-			System.out.println("You now have "+p.health+" hp.");
-		} 
-		p.health=(p.health-edmg);
-		System.out.println("You now have "+p.health+" hp.");
-
+		if (a.equals("h")) {
+			eatItem("healingpot");
+		}
+		if (p.health < 0) {
+			System.out.println("You lose");
+		}
+		if (e.health < 0) {
+			System.out.println("You win");
+		}
 	}
 }
 }
